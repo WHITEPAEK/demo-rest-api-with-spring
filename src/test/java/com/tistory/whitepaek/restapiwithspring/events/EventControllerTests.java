@@ -2,7 +2,6 @@ package com.tistory.whitepaek.restapiwithspring.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tistory.whitepaek.restapiwithspring.common.TestDescription;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class EventControllerTests {
                 .beginEnrollmentDateTime(LocalDateTime.of(2020, 9, 7, 21, 00, 00))
                 .closeEnrollmentDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
                 .beginEventDateTime(LocalDateTime.of(2020, 9, 8, 9, 00, 00))
-                .endEventDateTime(LocalDateTime.of(2020, 9, 20, 21, 00, 00))
+                .endEventDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -56,8 +55,8 @@ public class EventControllerTests {
                 .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("free").value(false))
+                .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
     }
 
