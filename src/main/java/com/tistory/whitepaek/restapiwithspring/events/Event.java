@@ -29,7 +29,7 @@ public class Event {
 
     public void update() {
         // Update free
-        if (this.basePrice == 00 && this.maxPrice == 0) {
+        if (this.basePrice == 0 && this.maxPrice == 0) {
             this.free = true;
         } else {
             this.free = false;
