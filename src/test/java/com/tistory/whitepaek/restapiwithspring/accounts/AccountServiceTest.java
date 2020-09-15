@@ -1,7 +1,7 @@
 package com.tistory.whitepaek.restapiwithspring.accounts;
 
-import com.tistory.whitepaek.restapiwithspring.common.BaseControllerTest;
-import org.junit.Test;
+import com.tistory.whitepaek.restapiwithspring.common.BaseTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,9 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class AccountServiceTest extends BaseControllerTest {
+// JUnit 5 Test
+public class AccountServiceTest extends BaseTest {
 
     @Autowired
     AccountService accountService;
@@ -44,14 +45,7 @@ public class AccountServiceTest extends BaseControllerTest {
 
     @Test
     public void findByUsernameFail() {
-        String username = "whitepaek@icloud.com";
-
-        try {
-            accountService.loadUserByUsername(username);
-            fail("Supposed to be failed");
-        } catch (UsernameNotFoundException e) {
-            assertThat(e.getMessage()).containsSequence(username);
-        }
+        assertThrows(UsernameNotFoundException.class, () -> accountService.loadUserByUsername("whitepaek@icloud.com"));
     }
 
 }

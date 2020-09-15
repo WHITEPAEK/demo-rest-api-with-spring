@@ -2,9 +2,9 @@ package com.tistory.whitepaek.restapiwithspring.configs;
 
 import com.tistory.whitepaek.restapiwithspring.accounts.AccountService;
 import com.tistory.whitepaek.restapiwithspring.common.AppProperties;
-import com.tistory.whitepaek.restapiwithspring.common.BaseControllerTest;
-import com.tistory.whitepaek.restapiwithspring.common.TestDescription;
-import org.junit.Test;
+import com.tistory.whitepaek.restapiwithspring.common.BaseTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -13,7 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AuthServerConfigTest extends BaseControllerTest {
+// JUnit 5 Test
+public class AuthServerConfigTest extends BaseTest {
 
     @Autowired
     AccountService accountService;
@@ -22,7 +23,7 @@ public class AuthServerConfigTest extends BaseControllerTest {
     AppProperties appProperties;
 
     @Test
-    @TestDescription("인증 토큰을 발급 받는 테스트")
+    @DisplayName("인증 토큰을 발급 받는 테스트")
     public void getAuthToken() throws Exception {
         this.mockMvc.perform(post("/oauth/token")
                 .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))

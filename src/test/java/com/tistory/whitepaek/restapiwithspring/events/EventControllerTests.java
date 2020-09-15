@@ -5,10 +5,10 @@ import com.tistory.whitepaek.restapiwithspring.accounts.AccountRepository;
 import com.tistory.whitepaek.restapiwithspring.accounts.AccountRole;
 import com.tistory.whitepaek.restapiwithspring.accounts.AccountService;
 import com.tistory.whitepaek.restapiwithspring.common.AppProperties;
-import com.tistory.whitepaek.restapiwithspring.common.BaseControllerTest;
-import com.tistory.whitepaek.restapiwithspring.common.TestDescription;
-import org.junit.Before;
-import org.junit.Test;
+import com.tistory.whitepaek.restapiwithspring.common.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class EventControllerTests extends BaseControllerTest {
+// JUnit 5 Test
+public class EventControllerTests extends BaseTest {
 
     @Autowired
     EventRepository eventRepository;
@@ -44,14 +45,14 @@ public class EventControllerTests extends BaseControllerTest {
     @Autowired
     AppProperties appProperties;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.eventRepository.deleteAll();
         this.accountRepository.deleteAll();
     }
 
     @Test
-    @TestDescription("정상적으로 이벤트를 생성하는 테스트")
+    @DisplayName("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {
         EventDto event = EventDto.builder()
                 .name("Spring")
@@ -131,7 +132,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("입력 받을 수 없는 값을 사용하는 경우에 에러가 발생하는 테스트")
+    @DisplayName("입력 받을 수 없는 값을 사용하는 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request() throws Exception {
         Event event = Event.builder()
                 .id(100)
@@ -160,7 +161,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("입력 값이 비어있는 경우에 에러가 발생하는 테스트")
+    @DisplayName("입력 값이 비어있는 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
         EventDto eventDto = EventDto.builder().build();
 
@@ -172,7 +173,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("입력 값이 잘못된 경우에 에러가 발생하는 테스트")
+    @DisplayName("입력 값이 잘못된 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
         EventDto eventDto = EventDto.builder()
                 .name("Spring")
@@ -199,7 +200,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("30개의 이벤트를 10개씩 두번째 페이지 조회하기")
+    @DisplayName("30개의 이벤트를 10개씩 두번째 페이지 조회하기")
     public void queryEvents() throws Exception {
         // Given
         IntStream.range(0, 30).forEach(this::generateEvent);
@@ -219,7 +220,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("기존의 이벤트를 하나 조회하기")
+    @DisplayName("기존의 이벤트를 하나 조회하기")
     public void getEvent() throws Exception {
         // Given
         Account account = this.createAccount();
@@ -237,7 +238,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("30개의 이벤트를 10개씩 두번째 페이지 조회하기")
+    @DisplayName("30개의 이벤트를 10개씩 두번째 페이지 조회하기")
     public void queryEventsWithAuthentication() throws Exception {
         // Given
         IntStream.range(0, 30).forEach(this::generateEvent);
@@ -259,7 +260,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("없는 이벤트는 존회했을 때 404 응답받기")
+    @DisplayName("없는 이벤트는 존회했을 때 404 응답받기")
     public void getEvent_404() throws Exception {
         // When & Then
         this.mockMvc.perform(get("/api/events/0915"))
@@ -268,7 +269,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("이벤트를 정상적으로 수정하기")
+    @DisplayName("이벤트를 정상적으로 수정하기")
     public void updateEvent() throws Exception {
         // Given
         Account account = this.createAccount();
@@ -291,7 +292,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("입력값이 비어있는 경우에 이벤트 수정 실패")
+    @DisplayName("입력값이 비어있는 경우에 이벤트 수정 실패")
     public void updateEvent_400_Empty() throws Exception {
         // Given
         Event event = this.generateEvent(200);
@@ -308,7 +309,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("입력값이 잘못된 경우에 이벤트 수정 실패")
+    @DisplayName("입력값이 잘못된 경우에 이벤트 수정 실패")
     public void updateEvent_400_Wrong() throws Exception {
         // Given
         Event event = this.generateEvent(200);
@@ -327,7 +328,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("존재하지 않는 이벤트 수정 실패")
+    @DisplayName("존재하지 않는 이벤트 수정 실패")
     public void updateEvent_404() throws Exception {
         // Given
         Event event = this.generateEvent(200);
@@ -355,20 +356,20 @@ public class EventControllerTests extends BaseControllerTest {
 
     private Event buildEvent(int i) {
         return Event.builder()
-                    .name("event" + i)
-                    .description("test event")
-                    .beginEnrollmentDateTime(LocalDateTime.of(2020, 9, 7, 21, 00, 00))
-                    .closeEnrollmentDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
-                    .beginEventDateTime(LocalDateTime.of(2020, 9, 8, 9, 00, 00))
-                    .endEventDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
-                    .basePrice(100)
-                    .maxPrice(200)
-                    .limitOfEnrollment(100)
-                    .location("디지털로 288 1708호 (주)비디")
-                    .free(false)
-                    .offline(true)
-                    .eventStatus(EventStatus.DRAFT)
-                    .build();
+                .name("event" + i)
+                .description("test event")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 9, 7, 21, 00, 00))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
+                .beginEventDateTime(LocalDateTime.of(2020, 9, 8, 9, 00, 00))
+                .endEventDateTime(LocalDateTime.of(2020, 9, 20, 23, 59, 59))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("디지털로 288 1708호 (주)비디")
+                .free(false)
+                .offline(true)
+                .eventStatus(EventStatus.DRAFT)
+                .build();
     }
 
     private String getBearerToken(boolean needToCreateAccount) throws Exception {

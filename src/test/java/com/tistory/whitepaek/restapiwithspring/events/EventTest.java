@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// JUnit 4 Test
 @RunWith(JUnitParamsRunner.class)
 public class EventTest {
 
