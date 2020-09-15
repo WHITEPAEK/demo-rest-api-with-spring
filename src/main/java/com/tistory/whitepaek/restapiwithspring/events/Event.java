@@ -1,6 +1,8 @@
 package com.tistory.whitepaek.restapiwithspring.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.tistory.whitepaek.restapiwithspring.accounts.Account;
+import com.tistory.whitepaek.restapiwithspring.accounts.AccountSerializer;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,6 +30,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
     @ManyToOne
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {

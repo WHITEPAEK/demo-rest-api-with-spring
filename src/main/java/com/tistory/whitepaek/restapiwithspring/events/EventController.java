@@ -1,5 +1,7 @@
 package com.tistory.whitepaek.restapiwithspring.events;
 
+import com.tistory.whitepaek.restapiwithspring.accounts.Account;
+import com.tistory.whitepaek.restapiwithspring.accounts.CurrentUser;
 import com.tistory.whitepaek.restapiwithspring.index.IndexController;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -36,7 +39,7 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors, @CurrentUser Account currentUser) {
 
         if (errors.hasErrors()) {
             return badRequest(errors);
@@ -49,6 +52,7 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
+        event.setManager(currentUser);
         Event newEvent = this.eventRepository.save(event);
 
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
@@ -64,15 +68,20 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler, @CurrentUser Account account) {
         Page<Event> page = this.eventRepository.findAll(pageable);
+
         var pagedModel = assembler.toModel(page, entity -> EntityModel.of(entity, linkTo(EventController.class).slash(entity.getId()).withSelfRel()));
         pagedModel.add(Link.of("/docs/index.html#resources-events-list").withRel("profile"));
+        if (account != null) {
+            pagedModel.add(linkTo(EventController.class).withRel("create-event"));
+        }
+
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getEvent(@PathVariable Integer id) {
+    public ResponseEntity getEvent(@PathVariable Integer id, @CurrentUser Account currentUser) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         if (optionalEvent.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -81,11 +90,15 @@ public class EventController {
         Event event = optionalEvent.get();
         EntityModel<Event> eventResource = EntityModel.of(event, linkTo(EventController.class).slash(event.getId()).withSelfRel());
         eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+        if (event.getManager().equals(currentUser)) {
+            eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+        }
+
         return ResponseEntity.ok(eventResource);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDto eventDto, Errors errors) {
+    public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDto eventDto, Errors errors, @CurrentUser Account currentUser) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         if (optionalEvent.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -101,6 +114,10 @@ public class EventController {
         }
 
         Event existingEvent = optionalEvent.get();
+        if (!existingEvent.getManager().equals(currentUser)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         this.modelMapper.map(eventDto, existingEvent); // eventDto -> existingEvent
         Event savedEvent = this.eventRepository.save(existingEvent);
 

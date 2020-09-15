@@ -30,4 +30,5 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
             .exceptionHandling()
                 .accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
+
 }
